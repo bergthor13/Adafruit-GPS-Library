@@ -259,6 +259,31 @@ boolean Adafruit_GPS::parse(char *nmea) {
     // we dont parse the remaining, yet!
     return true;
   }
+  if (strstr(nmea, "$GPGSV")) {
+    // found GSV
+    char *p = nmea;
+    Serial.print(p);
+    // get number of messages
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      messages = atoi(p);
+    }
+
+    int messageNumber;
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      messageNumber = atoi(p);
+    }
+
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      satellitesInView = atoi(p);
+    }
+    return true;
+  }
 
   return false;
 }

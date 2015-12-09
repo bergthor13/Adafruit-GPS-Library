@@ -141,7 +141,7 @@ class Adafruit_GPS {
   float speed, angle, magvariation, HDOP;
   char lat, lon, mag;
   boolean fix;
-  uint8_t fixquality, satellites;
+  uint8_t fixquality, satellites, satellitesInView;
 
   boolean waitForSentence(const char *wait, uint8_t max = MAXWAITSENTENCE);
   boolean LOCUS_StartLogger(void);
@@ -152,6 +152,8 @@ class Adafruit_GPS {
   uint8_t LOCUS_type, LOCUS_mode, LOCUS_config, LOCUS_interval, LOCUS_distance, LOCUS_speed, LOCUS_status, LOCUS_percent;
  private:
   boolean paused;
+
+  uint8_t messages;
   
   uint8_t parseResponse(char *response);
 #ifdef __AVR__
