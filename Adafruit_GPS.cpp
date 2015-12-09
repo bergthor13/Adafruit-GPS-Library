@@ -259,10 +259,10 @@ boolean Adafruit_GPS::parse(char *nmea) {
     // we dont parse the remaining, yet!
     return true;
   }
-  if (strstr(nmea, "$GPGSV")) {
+
+    if (strstr(nmea, "$GPGSV")) {
     // found GSV
     char *p = nmea;
-    Serial.print(p);
     // get number of messages
     p = strchr(p, ',')+1;
     if (',' != *p)
