@@ -260,7 +260,7 @@ boolean Adafruit_GPS::parse(char *nmea) {
     return true;
   }
 
-    if (strstr(nmea, "$GPGSV")) {
+  if (strstr(nmea, "$GPGSV")) {
     // found GSV
     char *p = nmea;
     // get number of messages
@@ -323,19 +323,6 @@ boolean Adafruit_GPS::parse(char *nmea) {
       }
       satellitesLeft--;
     }
-
-    // for (int i = 0; i < DETAILED_SATELLITES && ; i++)
-    // {
-    //   Serial.print("Satellite "); Serial.print(i); Serial.print(": ");
-    //   Serial.print(satelliteDetail[i].prn);
-    //   Serial.print(" - ");
-    //   Serial.print(satelliteDetail[i].elevation);
-    //   Serial.print(" - ");
-    //   Serial.print(satelliteDetail[i].azimuth);
-    //   Serial.print(" - ");
-    //   Serial.println(satelliteDetail[i].snr);
-    // }
-    // Serial.println("------------------------");
     return true;
   }
 
