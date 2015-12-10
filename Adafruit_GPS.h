@@ -86,6 +86,9 @@ All text above must be included in any redistribution
 // how long to wait when we're looking for a response
 #define MAXWAITSENTENCE 5
 
+#define DETAILED_SATELLITES 20
+#define SATELLITES_SENTENCE 4
+
 #if ARDUINO >= 100
  #include "Arduino.h"
 #if defined (__AVR__) && !defined(__AVR_ATmega32U4__)
@@ -96,6 +99,20 @@ All text above must be included in any redistribution
  #include "NewSoftSerial.h"
 #endif
 
+struct Satellite {
+  // More information on what those values are:
+  // http://aprs.gids.nl/nmea/#gsv
+  uint8_t prn;
+  uint8_t elevation;
+  uint8_t azimuth;
+  uint8_t snr;
+  void clear() {
+    this->prn       = 0;
+    this->elevation = 0;
+    this->azimuth   = 0;
+    this->snr       = 0;
+  }
+};
 
 class Adafruit_GPS {
  public:
@@ -150,10 +167,12 @@ class Adafruit_GPS {
 
   uint16_t LOCUS_serial, LOCUS_records;
   uint8_t LOCUS_type, LOCUS_mode, LOCUS_config, LOCUS_interval, LOCUS_distance, LOCUS_speed, LOCUS_status, LOCUS_percent;
+
+  Satellite satelliteDetail[DETAILED_SATELLITES];
  private:
   boolean paused;
 
-  uint8_t messages;
+  uint8_t messages, satellitesLeft;
   
   uint8_t parseResponse(char *response);
 #ifdef __AVR__

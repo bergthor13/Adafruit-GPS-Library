@@ -270,7 +270,7 @@ boolean Adafruit_GPS::parse(char *nmea) {
       messages = atoi(p);
     }
 
-    int messageNumber;
+    uint8_t messageNumber;
     p = strchr(p, ',')+1;
     if (',' != *p)
     {
@@ -282,6 +282,60 @@ boolean Adafruit_GPS::parse(char *nmea) {
     {
       satellitesInView = atoi(p);
     }
+
+    // If we are getting a new batch of sentences.
+    if (messageNumber == 1)
+    {
+      for (int i = 0; i < DETAILED_SATELLITES; ++i)
+      {
+        satelliteDetail[i].clear();
+      }
+      satellitesLeft = satellitesInView;
+    }
+
+    for (int i = 0; i < SATELLITES_SENTENCE && satellitesLeft > 0; ++i)
+    {
+      // PRN
+      p = strchr(p, ',')+1;
+      if (',' != *p)
+      {
+        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].prn = atoi(p);
+      }
+      // Elevation
+      p = strchr(p, ',')+1;
+      if (',' != *p)
+      {
+        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].elevation = atoi(p);
+      }
+
+      // Azimuth
+      p = strchr(p, ',')+1;
+      if (',' != *p)
+      {
+        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].azimuth = atoi(p);
+      }
+
+      // SNR
+      p = strchr(p, ',')+1;
+      if (',' != *p)
+      {
+        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].snr = atoi(p);
+      }
+      satellitesLeft--;
+    }
+
+    // for (int i = 0; i < DETAILED_SATELLITES && ; i++)
+    // {
+    //   Serial.print("Satellite "); Serial.print(i); Serial.print(": ");
+    //   Serial.print(satelliteDetail[i].prn);
+    //   Serial.print(" - ");
+    //   Serial.print(satelliteDetail[i].elevation);
+    //   Serial.print(" - ");
+    //   Serial.print(satelliteDetail[i].azimuth);
+    //   Serial.print(" - ");
+    //   Serial.println(satelliteDetail[i].snr);
+    // }
+    // Serial.println("------------------------");
     return true;
   }
 
