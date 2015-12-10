@@ -102,9 +102,9 @@ All text above must be included in any redistribution
 struct Satellite {
   // More information on what those values are:
   // http://aprs.gids.nl/nmea/#gsv
-  uint8_t prn;
+  uint16_t prn;
+  uint16_t azimuth;
   uint8_t elevation;
-  uint8_t azimuth;
   uint8_t snr;
   void clear() {
     this->prn       = 0;

@@ -286,10 +286,6 @@ boolean Adafruit_GPS::parse(char *nmea) {
     // If we are getting a new batch of sentences.
     if (messageNumber == 1)
     {
-      for (int i = 0; i < DETAILED_SATELLITES; ++i)
-      {
-        satelliteDetail[i].clear();
-      }
       satellitesLeft = satellitesInView;
     }
 
