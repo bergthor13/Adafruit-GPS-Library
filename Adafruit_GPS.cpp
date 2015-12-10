@@ -291,32 +291,43 @@ boolean Adafruit_GPS::parse(char *nmea) {
 
     for (int i = 0; i < SATELLITES_SENTENCE && satellitesLeft > 0; ++i)
     {
+      Satellite* currSat = &satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))];
       // PRN
       p = strchr(p, ',')+1;
       if (',' != *p)
       {
-        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].prn = atoi(p);
+        currSat->prn = atoi(p);
+      } else {
+        currSat->prn = NULL;
       }
+
       // Elevation
       p = strchr(p, ',')+1;
       if (',' != *p)
       {
-        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].elevation = atoi(p);
+        currSat->elevation = atoi(p);
+      } else {
+        currSat->elevation = NULL;
       }
 
       // Azimuth
       p = strchr(p, ',')+1;
       if (',' != *p)
       {
-        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].azimuth = atoi(p);
+        currSat->azimuth = atoi(p);
+      } else {
+        currSat->azimuth = NULL;
       }
 
       // SNR
       p = strchr(p, ',')+1;
       if (',' != *p)
       {
-        satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))].snr = atoi(p);
+        currSat->snr = atoi(p);
+      } else {
+        currSat->snr = NULL;
       }
+
       satellitesLeft--;
     }
     return true;
