@@ -106,12 +106,6 @@ struct Satellite {
   uint16_t azimuth;
   uint8_t elevation;
   uint8_t snr;
-  void clear() {
-    this->prn       = 0;
-    this->elevation = 0;
-    this->azimuth   = 0;
-    this->snr       = 0;
-  }
 };
 
 class Adafruit_GPS {
