@@ -259,6 +259,46 @@ boolean Adafruit_GPS::parse(char *nmea) {
     // we dont parse the remaining, yet!
     return true;
   }
+  if (strstr(nmea, "$GPGSA")) {
+    // found GSA
+    char *p = nmea;
+    // get number of messages
+    p = strchr(p, ',')+3;
+    if (',' != *p)
+    {
+      fixMode = atoi(p);
+    }
+    
+    sv.clearSatUsage();
+    
+    for (int i = 0; i < NUM_CHANNELS; i++) {
+      p = strchr(p, ',')+1;
+      if (',' != *p)
+      {
+        sv.useSatellite(atoi(p));
+      }
+    }
+    
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      PDOP = atof(p);
+    }
+    
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      HDOP = atof(p);
+    }
+    
+    p = strchr(p, ',')+1;
+    if (',' != *p)
+    {
+      VDOP = atof(p);
+    }
+
+    return true;
+  }
 
   if (strstr(nmea, "$GPGSV")) {
     // found GSV
@@ -276,22 +316,23 @@ boolean Adafruit_GPS::parse(char *nmea) {
     {
       messageNumber = atoi(p);
     }
-
+    uint8_t satsInView;
     p = strchr(p, ',')+1;
     if (',' != *p)
     {
-      satellitesInView = atoi(p);
+      satsInView = atoi(p);
     }
 
     // If we are getting a new batch of sentences.
     if (messageNumber == 1)
     {
-      satellitesLeft = satellitesInView;
+      satellitesLeft = satsInView;
+      gsvClean = false;
     }
 
     for (int i = 0; i < SATELLITES_SENTENCE && satellitesLeft > 0; ++i)
     {
-      Satellite* currSat = &satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))];
+      Satellite* currSat = &sv.satelliteDetail[i+(SATELLITES_SENTENCE*(messageNumber-1))];
       // PRN
       p = strchr(p, ',')+1;
       if (',' != *p)
@@ -330,6 +371,11 @@ boolean Adafruit_GPS::parse(char *nmea) {
 
       satellitesLeft--;
     }
+
+    if(messageNumber == messages) {
+      gsvClean = true;
+    }
+    satellitesInView = satsInView;
     return true;
   }
 
@@ -420,7 +466,7 @@ void Adafruit_GPS::common_init(void) {
   fix = false; // boolean
   milliseconds = 0; // uint16_t
   latitude = longitude = geoidheight = altitude =
-    speed = angle = magvariation = HDOP = 0.0; // float
+    speed = angle = magvariation = PDOP = HDOP = VDOP = 0.0; // float
 }
 
 void Adafruit_GPS::begin(uint16_t baud)

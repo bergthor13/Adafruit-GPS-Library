@@ -86,8 +86,9 @@ All text above must be included in any redistribution
 // how long to wait when we're looking for a response
 #define MAXWAITSENTENCE 5
 
-#define DETAILED_SATELLITES 20
+#define DETAILED_SATELLITES 22
 #define SATELLITES_SENTENCE 4
+#define NUM_CHANNELS 12
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -102,10 +103,35 @@ All text above must be included in any redistribution
 struct Satellite {
   // More information on what those values are:
   // http://aprs.gids.nl/nmea/#gsv
-  uint16_t prn;
-  uint16_t azimuth;
-  uint8_t elevation;
-  uint8_t snr;
+  uint16_t prn       = NULL;
+  uint16_t azimuth   = NULL;
+  uint8_t  elevation = NULL;
+  uint8_t  snr       = NULL;
+  bool     used      = false;
+};
+
+class SatelliteView {
+public:
+    Satellite satelliteDetail[DETAILED_SATELLITES];
+
+    void useSatellite(uint16_t prn) {
+        for (int i = 0; i < DETAILED_SATELLITES; i++)
+        {
+            if (satelliteDetail[i].prn == prn)
+            {
+                satelliteDetail[i].used = true;
+                return;
+            }
+        }
+        return;
+    }
+
+    void clearSatUsage() {
+        for (int i = 0; i < DETAILED_SATELLITES; i++)
+        {
+            satelliteDetail[i].used = false;
+        }
+    }
 };
 
 class Adafruit_GPS {
@@ -149,10 +175,10 @@ class Adafruit_GPS {
   int32_t latitude_fixed, longitude_fixed;
   float latitudeDegrees, longitudeDegrees;
   float geoidheight, altitude;
-  float speed, angle, magvariation, HDOP;
+  float speed, angle, magvariation, PDOP, HDOP, VDOP;
   char lat, lon, mag;
   boolean fix;
-  uint8_t fixquality, satellites, satellitesInView;
+  uint8_t fixquality, fixMode, satellites, satellitesInView;
 
   boolean waitForSentence(const char *wait, uint8_t max = MAXWAITSENTENCE);
   boolean LOCUS_StartLogger(void);
@@ -161,12 +187,12 @@ class Adafruit_GPS {
 
   uint16_t LOCUS_serial, LOCUS_records;
   uint8_t LOCUS_type, LOCUS_mode, LOCUS_config, LOCUS_interval, LOCUS_distance, LOCUS_speed, LOCUS_status, LOCUS_percent;
-
-  Satellite satelliteDetail[DETAILED_SATELLITES];
+  SatelliteView sv;
  private:
   boolean paused;
 
   uint8_t messages, satellitesLeft;
+  bool gsvClean;
   
   uint8_t parseResponse(char *response);
 #ifdef __AVR__
